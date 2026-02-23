@@ -109,7 +109,7 @@ DELISPECTは病院ごとに異なる電子カルテシステムとの連携が�
    - バリデーションロジックの共有
 
 3. **MLはPython継続が適切**
-   - scikit-learn、pandas等のMLエコシステムが成熟
+   - deep learningフレームワーク等のMLエコシステムが成熟
    - モデル開発・検証のツールチェーンが充実
    - ML専門知識を持つ人材はPythonに習熟していることが多い
    - TypeScript移行のコスト対効果が低い
@@ -200,7 +200,7 @@ delispect/
 | 言語（ML） | Python | MLエコシステム活用のため継続 |
 | ランタイム | Node.js / Python | LTS版を使用 |
 | Webフレームワーク | Next.js | App Router, Server Actions |
-| ML | scikit-learn等 | リスク判定モデル |
+| ML | deep learning | リスク判定モデル |
 
 ---
 
