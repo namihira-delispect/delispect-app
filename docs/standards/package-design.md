@@ -8,7 +8,7 @@
 ### 関連ドキュメント
 
 - [コーディングガイドライン](./coding-guidelines.md) - フロントエンド層の構成
-- [ADR#0001: Monorepo + TypeScript統一（ML除く）](../adr/0001-monorepo-typescript.md) - 採用決定の背景
+- [ADR#0001: Monorepo + TypeScript統一（ML除く）](../decision-records/0001-monorepo-typescript.md) - 採用決定の背景
 
 ---
 

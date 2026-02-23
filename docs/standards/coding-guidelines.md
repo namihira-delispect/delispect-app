@@ -11,7 +11,7 @@ Monorepo構成における統一的なコードスタイルと設計パターン
 - [フロントエンドパターン](./frontend-patterns.md) - コンポーネント設計・データ取得
 - [Server Actionsガイドライン](./server-actions.md) - Server Actionsの実装パターン
 - [テストガイドライン](./testing-guidelines.md) - テスト方針
-- [ADR#0001](../adr/0001-monorepo-typescript.md) - 技術選定の背景
+- [ADR#0001](../decision-records/0001-monorepo-typescript.md) - 技術選定の背景
 
 ---
 

@@ -3,11 +3,11 @@
 ## 1. 概要
 
 本ドキュメントは、DELISPECTプロジェクトにおける開発フローの概要を定義する。
-詳細なチーム体制・役割・品質管理については [ADR-0002: AI駆動開発チーム体制](../adr/0002-ai-driven-development-team.md) を参照。
+詳細なチーム体制・役割・品質管理については [ADR-0002: AI駆動開発チーム体制](../decision-records/0002-ai-driven-development-team.md) を参照。
 
 ### 関連ドキュメント
 
-- [ADR-0002: AI駆動開発チーム体制](../adr/0002-ai-driven-development-team.md) - 役割定義、品質ゲート、品質保証レベル
+- [ADR-0002: AI駆動開発チーム体制](../decision-records/0002-ai-driven-development-team.md) - 役割定義、品質ゲート、品質保証レベル
 - [ブランチ戦略](./branching-strategy.md) - GitHub Flow、PR規約
 - [チケット記述ガイドライン](./ticket-writing.md) - チケットの書き方
 
@@ -57,7 +57,7 @@ flowchart TD
     phase5 -.->|修正要| phase4
 ```
 
-> **本製品版ではLv.2（品質保証レベル）を適用。** 重要箇所は担当開発者がコードレビューを実施し、必要に応じて他開発者へレビューを依頼する。詳細は [ADR-0002 セクション5](../adr/0002-ai-driven-development-team.md#5-品質管理) を参照。
+> **本製品版ではLv.2（品質保証レベル）を適用。** 重要箇所は担当開発者がコードレビューを実施し、必要に応じて他開発者へレビューを依頼する。詳細は [ADR-0002 セクション5](../decision-records/0002-ai-driven-development-team.md#5-品質管理) を参照。
 
 ---
 

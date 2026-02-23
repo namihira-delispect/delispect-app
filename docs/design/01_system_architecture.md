@@ -28,8 +28,8 @@
 - 技術スタック
 
 ### 1.3 関連ドキュメント
-- [ADR-0001: Monorepo + TypeScript統一](../adr/0001-monorepo-typescript.md)
-- [ADR-0003: ML推論の同期API方式](../adr/0003-ml-sync-api.md)
+- [ADR-0001: Monorepo + TypeScript統一](../decision-records/0001-monorepo-typescript.md)
+- [ADR-0003: ML推論の同期API方式](../decision-records/0003-ml-sync-api.md)
 - [ディレクトリ設計ガイドライン](../standards/package-design.md)
 - [コーディングガイドライン](../standards/coding-guidelines.md)
 - [Server Actionsガイドライン](../standards/server-actions.md)

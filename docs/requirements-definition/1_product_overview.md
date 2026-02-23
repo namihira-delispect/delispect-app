@@ -39,7 +39,7 @@ DELISPECT（デリスペクト）
 - **ML API（Python）**: せん妄AI発症予測を実施するリスク判定サービス
 - **RDBMS**: 患者情報等のデータを管理するデータベース
 
-> 技術選定の詳細は [ADR-0001: Monorepo + TypeScript統一](../adr/0001-monorepo-typescript.md) を参照。
+> 技術選定の詳細は [ADR-0001: Monorepo + TypeScript統一](../decision-records/0001-monorepo-typescript.md) を参照。
 
 ## 3. 対象ユーザー
 
