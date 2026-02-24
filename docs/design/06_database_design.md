@@ -697,6 +697,10 @@ MLモデルによるせん妄リスク評価結果。基本的に1入院1回だ�
 
 #### details JSONスキーマ（カテゴリ別）
 
+**共通型: TernaryOption**
+
+問診の回答項目には三値型 `TernaryOption` を使用する。`"yes"` / `"no"` / `"unknown"`（不明）の3値をとり、未回答時は `null`。
+
 ##### MEDICINE（薬剤）
 
 ```json
@@ -717,24 +721,25 @@ MLモデルによるせん妄リスク評価結果。基本的に1入院1回だ�
 
 ```json
 {
-  "hasPain": true,
+  "hasPain": "yes",
+  "isNightAwakening": "unknown",
   "sites": [
     {
       "site": "t1,t2",
-      "painOnTouch": true,
+      "painOnTouch": "yes",
       "painOnTouchDetail": "...",
-      "painOnMove": false,
+      "painOnMove": "no",
       "painOnMoveDetail": null,
-      "numbness": true,
+      "numbness": "yes",
       "numbnessDetail": "...",
       "remarks": null
     }
   ],
-  "influenceOnSleep": true,
+  "influenceOnSleep": "yes",
   "influenceOnSleepDesc": "...",
-  "influenceOnMove": false,
+  "influenceOnMove": "no",
   "influenceOnMoveDesc": null,
-  "influenceOnExcretion": false,
+  "influenceOnExcretion": "no",
   "influenceOnExcretionDesc": null,
   "influenceRemarks": null
 }
@@ -742,21 +747,22 @@ MLモデルによるせん妄リスク評価結果。基本的に1入院1回だ�
 
 | フィールド | 型 | 説明 |
 |-----------|------|------|
-| `hasPain` | `boolean \| null` | 痛みあり |
+| `hasPain` | `TernaryOption \| null` | 痛みあり |
+| `isNightAwakening` | `TernaryOption \| null` | 夜間覚醒あり |
 | `sites` | `PainSite[]` | 疼痛部位（デルマトーム、複数可） |
 | `sites[].site` | `string` | 部位コード（カンマ区切り） |
-| `sites[].painOnTouch` | `boolean \| null` | 触った時の痛み |
+| `sites[].painOnTouch` | `TernaryOption \| null` | 触った時の痛み |
 | `sites[].painOnTouchDetail` | `string \| null` | 詳細 |
-| `sites[].painOnMove` | `boolean \| null` | 動かした時の痛み |
+| `sites[].painOnMove` | `TernaryOption \| null` | 動かした時の痛み |
 | `sites[].painOnMoveDetail` | `string \| null` | 詳細 |
-| `sites[].numbness` | `boolean \| null` | 違和感・しびれ |
+| `sites[].numbness` | `TernaryOption \| null` | 違和感・しびれ |
 | `sites[].numbnessDetail` | `string \| null` | 詳細 |
 | `sites[].remarks` | `string \| null` | 備考 |
-| `influenceOnSleep` | `boolean \| null` | 睡眠への影響 |
+| `influenceOnSleep` | `TernaryOption \| null` | 睡眠への影響 |
 | `influenceOnSleepDesc` | `string \| null` | 詳細 |
-| `influenceOnMove` | `boolean \| null` | 動作への影響 |
+| `influenceOnMove` | `TernaryOption \| null` | 動作への影響 |
 | `influenceOnMoveDesc` | `string \| null` | 詳細 |
-| `influenceOnExcretion` | `boolean \| null` | 排泄への影響 |
+| `influenceOnExcretion` | `TernaryOption \| null` | 排泄への影響 |
 | `influenceOnExcretionDesc` | `string \| null` | 詳細 |
 | `influenceRemarks` | `string \| null` | 生活影響の備考 |
 
@@ -764,77 +770,77 @@ MLモデルによるせん妄リスク評価結果。基本的に1入院1回だ�
 
 ```json
 {
-  "isAbnormalBlood": true,
-  "isAbnormalVital": false,
+  "isAbnormalBlood": "yes",
+  "isAbnormalVital": "no",
   "skinCondition": "NORMAL",
   "oralCondition": "ABNORMAL",
-  "isLightheadedness": false,
+  "isLightheadedness": "no",
   "urineCondition": "UNKNOWN",
-  "isHydrationWithin12h": true,
-  "isHydration1lOrMore": false,
-  "canDrinkWater": true
+  "isHydrationWithin12h": "yes",
+  "isHydration1lOrMore": "no",
+  "canDrinkWater": "yes"
 }
 ```
 
 | フィールド | 型 | 説明 |
 |-----------|------|------|
-| `isAbnormalBlood` | `boolean \| null` | 採血データ異常（Ht, Hb） |
-| `isAbnormalVital` | `boolean \| null` | 脈拍・血圧異常 |
+| `isAbnormalBlood` | `TernaryOption \| null` | 採血データ異常（Ht, Hb） |
+| `isAbnormalVital` | `TernaryOption \| null` | 脈拍・血圧異常 |
 | `skinCondition` | `"UNKNOWN" \| "NORMAL" \| "ABNORMAL" \| null` | 皮膚の状態 |
 | `oralCondition` | `"UNKNOWN" \| "NORMAL" \| "ABNORMAL" \| null` | 口腔の状態 |
-| `isLightheadedness` | `boolean \| null` | たちくらみ・ふらつき |
+| `isLightheadedness` | `TernaryOption \| null` | たちくらみ・ふらつき |
 | `urineCondition` | `"UNKNOWN" \| "NORMAL" \| "ABNORMAL" \| null` | 尿の状態 |
-| `isHydrationWithin12h` | `boolean \| null` | 12時間以内の補水あり |
-| `isHydration1lOrMore` | `boolean \| null` | 1日1L以上の水分摂取 |
-| `canDrinkWater` | `boolean \| null` | 経口摂水可能 |
+| `isHydrationWithin12h` | `TernaryOption \| null` | 12時間以内の補水あり |
+| `isHydration1lOrMore` | `TernaryOption \| null` | 1日1L以上の水分摂取 |
+| `canDrinkWater` | `TernaryOption \| null` | 経口摂水可能 |
 
 ##### CONSTIPATION（便秘）
 
 ```json
 {
-  "isOver3d": true,
+  "isOver3d": "yes",
   "hardness": "HARD",
-  "isBowelMovementNormal": false,
-  "hasFart": true,
-  "isGasBuildup": false,
-  "isTouchStool": false,
-  "canUseLaxative": true,
-  "hasNausea": false,
-  "hasStomachAche": false,
-  "hasAppetite": true,
+  "isBowelMovementAbnormal": "no",
+  "hasFart": "yes",
+  "isGasBuildup": "no",
+  "isTouchStool": "no",
+  "canUseLaxative": "yes",
+  "hasNausea": "no",
+  "hasStomachAche": "no",
+  "hasAppetite": "yes",
   "foodVolume": "MEDIUM"
 }
 ```
 
 | フィールド | 型 | 説明 |
 |-----------|------|------|
-| `isOver3d` | `boolean \| null` | 3日以上排便なし |
+| `isOver3d` | `TernaryOption \| null` | 3日以上排便なし |
 | `hardness` | `"HARD" \| "NORMAL" \| "SOFT" \| "UNKNOWN" \| null` | 便の硬さ |
-| `isBowelMovementNormal` | `boolean \| null` | 腸蠕動音正常 |
-| `hasFart` | `boolean \| null` | 放屁あり |
-| `isGasBuildup` | `boolean \| null` | ガス貯留 |
-| `isTouchStool` | `boolean \| null` | 触診で便塊あり |
-| `canUseLaxative` | `boolean \| null` | 下剤使用経験あり |
-| `hasNausea` | `boolean \| null` | 吐き気あり |
-| `hasStomachAche` | `boolean \| null` | 腹痛あり |
-| `hasAppetite` | `boolean \| null` | 食欲あり |
-| `foodVolume` | `"LARGE" \| "MEDIUM" \| "SMALL" \| null` | 食事量 |
+| `isBowelMovementAbnormal` | `TernaryOption \| null` | 腸蠕動音異常 |
+| `hasFart` | `TernaryOption \| null` | 放屁あり |
+| `isGasBuildup` | `TernaryOption \| null` | ガス貯留 |
+| `isTouchStool` | `TernaryOption \| null` | 触診で便塊あり |
+| `canUseLaxative` | `TernaryOption \| null` | 下剤使用経験あり |
+| `hasNausea` | `TernaryOption \| null` | 吐き気あり |
+| `hasStomachAche` | `TernaryOption \| null` | 腹痛あり |
+| `hasAppetite` | `TernaryOption \| null` | 食欲あり |
+| `foodVolume` | `"LARGE" \| "MEDIUM" \| "SMALL" \| "UNKNOWN" \| null` | 食事量 |
 
 ##### INFLAMMATION（炎症）
 
 ```json
 {
-  "isAbnormalBlood": true,
-  "isAbnormalVital": false,
-  "hasPain": false
+  "isAbnormalBlood": "yes",
+  "isAbnormalVital": "no",
+  "hasPain": "no"
 }
 ```
 
 | フィールド | 型 | 説明 |
 |-----------|------|------|
-| `isAbnormalBlood` | `boolean \| null` | 採血データ異常（CRP, WBC） |
-| `isAbnormalVital` | `boolean \| null` | 脈拍・血圧・SpO2異常 |
-| `hasPain` | `boolean \| null` | 炎症に伴う痛みあり |
+| `isAbnormalBlood` | `TernaryOption \| null` | 採血データ異常（CRP, WBC） |
+| `isAbnormalVital` | `TernaryOption \| null` | 脈拍・血圧・SpO2異常 |
+| `hasPain` | `TernaryOption \| null` | 炎症に伴う痛みあり |
 
 ##### MOBILIZATION / DEMENTIA / SAFETY / SLEEP（離床・認知症・安全管理・睡眠）
 
