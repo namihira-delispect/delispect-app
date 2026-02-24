@@ -133,6 +133,7 @@ erDiagram
         boolean has_organic_brain_damage
         boolean is_heavy_alcohol
         boolean has_delirium_history
+        boolean uses_psychotropic_drugs
         boolean has_general_anesthesia
     }
 
@@ -341,6 +342,10 @@ erDiagram
 - PK: `id`
 - UQ: `patient_id`
 
+**インデックス**:
+
+- `patient_id` UNIQUE（電子カルテ患者IDによる検索）
+
 **リレーション**:
 
 - `patients` 1 → N `admissions`
@@ -374,6 +379,12 @@ erDiagram
 - FK: `patient_id` → `patients(id)`
 - UQ: `external_admission_id`
 
+**インデックス**:
+
+- `patient_id`（患者の入院一覧取得）
+- `admission_date`（入院日による絞り込み）
+- `external_admission_id` UNIQUE（電子カルテ入院IDによる検索）
+
 **リレーション**:
 
 - `patients` 1 → N `admissions`
@@ -395,17 +406,18 @@ erDiagram
 |----------------------------|----------------|------|---------|---------------------------|
 | `id`                       | `SERIAL`       | NO   | 自動採番    | 主キー                       |
 | `admission_id`             | `INT`          | NO   | -       | FK: `admissions.id`（ユニーク） |
-| `has_dementia`             | `BOOLEAN`      | NO   | `false` | 認知症                       |
-| `has_organic_brain_damage` | `BOOLEAN`      | NO   | `false` | 脳器質的障害                    |
-| `is_heavy_alcohol`         | `BOOLEAN`      | NO   | `false` | アルコール多飲                   |
-| `has_delirium_history`     | `BOOLEAN`      | NO   | `false` | せん妄既往                     |
-| `has_general_anesthesia`   | `BOOLEAN`      | NO   | `false` | 全身麻酔                      |
-| `has_emergency_surgery`    | `BOOLEAN`      | NO   | `false` | 緊急手術                      |
-| `has_scheduled_surgery`    | `BOOLEAN`      | NO   | `false` | 予定手術                      |
-| `has_head_neck_surgery`    | `BOOLEAN`      | NO   | `false` | 頭頸部手術                     |
-| `has_chest_surgery`        | `BOOLEAN`      | NO   | `false` | 胸部手術                      |
-| `has_abdominal_surgery`    | `BOOLEAN`      | NO   | `false` | 腹部手術                      |
-| `has_admission_oxygen_use` | `BOOLEAN`      | NO   | `false` | 入院時酸素使用                   |
+| `has_dementia`             | `BOOLEAN`      | YES  | -       | 認知症                       |
+| `has_organic_brain_damage` | `BOOLEAN`      | YES  | -       | 脳器質的障害                    |
+| `is_heavy_alcohol`         | `BOOLEAN`      | YES  | -       | アルコール多飲                   |
+| `has_delirium_history`     | `BOOLEAN`      | YES  | -       | せん妄既往                     |
+| `uses_psychotropic_drugs`  | `BOOLEAN`      | YES  | -       | 向精神薬使用                    |
+| `has_general_anesthesia`   | `BOOLEAN`      | YES  | -       | 全身麻酔                      |
+| `has_emergency_surgery`    | `BOOLEAN`      | YES  | -       | 緊急手術                      |
+| `has_scheduled_surgery`    | `BOOLEAN`      | YES  | -       | 予定手術                      |
+| `has_head_neck_surgery`    | `BOOLEAN`      | YES  | -       | 頭頸部手術                     |
+| `has_chest_surgery`        | `BOOLEAN`      | YES  | -       | 胸部手術                      |
+| `has_abdominal_surgery`    | `BOOLEAN`      | YES  | -       | 腹部手術                      |
+| `has_admission_oxygen_use` | `BOOLEAN`      | YES  | -       | 入院時酸素使用                   |
 | `oxygen_level`             | `DECIMAL(4,1)` | YES  | -       | 入院時酸素投与量（L/min）           |
 | `version`                  | `INT`          | NO   | `0`     | 楽観的ロック用バージョン              |
 | `created_at`               | `TIMESTAMPTZ`  | NO   | `now()` | 作成日時                      |
@@ -440,10 +452,16 @@ erDiagram
 | `systolic_bp`      | `INT`          | YES  | -       | 収縮期血圧（mmHg）         |
 | `diastolic_bp`     | `INT`          | YES  | -       | 拡張期血圧（mmHg）         |
 | `spo2`             | `DECIMAL(4,1)` | YES  | -       | SpO2（%）             |
-| `respiratory_rate` | `INT`          | YES  | -       | 呼吸数（回/min）          |
-| `measured_at`      | `TIMESTAMPTZ`  | NO   | -       | 測定日時                |
-| `created_at`       | `TIMESTAMPTZ`  | NO   | `now()` | 作成日時                |
-| `updated_at`       | `TIMESTAMPTZ`  | NO   | 自動更新    | 更新日時                |
+| `respiratory_rate`      | `INT`          | YES  | -       | 呼吸数（回/min）          |
+| `measured_at`           | `TIMESTAMPTZ`  | NO   | -       | 代表測定日時（Upsert・表示用）  |
+| `body_temperature_at`   | `TIMESTAMPTZ`  | YES  | -       | 体温測定日時              |
+| `pulse_at`              | `TIMESTAMPTZ`  | YES  | -       | 脈拍測定日時              |
+| `systolic_bp_at`        | `TIMESTAMPTZ`  | YES  | -       | 収縮期血圧測定日時           |
+| `diastolic_bp_at`       | `TIMESTAMPTZ`  | YES  | -       | 拡張期血圧測定日時           |
+| `spo2_at`               | `TIMESTAMPTZ`  | YES  | -       | SpO2測定日時             |
+| `respiratory_rate_at`   | `TIMESTAMPTZ`  | YES  | -       | 呼吸数測定日時             |
+| `created_at`            | `TIMESTAMPTZ`  | NO   | `now()` | 作成日時                |
+| `updated_at`            | `TIMESTAMPTZ`  | NO   | 自動更新    | 更新日時                |
 
 **制約**:
 
@@ -451,10 +469,15 @@ erDiagram
 - FK: `admission_id` → `admissions(id)`
 - UQ: `(admission_id, measured_at)`（同一入院・同一日時の重複防止）
 
+**インデックス**:
+
+- `(admission_id, measured_at)` UNIQUE（Upsert用・時系列検索）
+
 **備考**:
 
 - 旧スキーマ `T_PatientMeasurement` ではバイタルと検査値が1行にまとまっていたが、ドメインモデルに合わせてバイタルと検査結果を分離
-- バイタルサインは同時に測定されるため、1レコードに各項目をまとめる（正規化しない）
+- バイタルサインは1レコードに各項目をまとめる（正規化しない）
+- `measured_at` は画面表示・Upsert用の代表日時。各項目の正確な測定日時は `*_at` カラムに保持する
 - 電子カルテ同期時はUpsert（`admission_id` + `measured_at` で一意特定）
 
 ---
@@ -479,6 +502,10 @@ erDiagram
 - FK: `admission_id` → `admissions(id)`
 - UQ: `(admission_id, item_code, measured_at)`（同一入院・同一項目・同一日時の重複防止）
 
+**インデックス**:
+
+- `(admission_id, item_code, measured_at)` UNIQUE（Upsert用・項目別検索）
+
 **備考**:
 
 - 旧スキーマでは1入院1レコードの横持ちテーブル（49カラム）だったが、検査項目別・測定日別の縦持ちに正規化
@@ -502,8 +529,10 @@ erDiagram
 | `unit`              | `VARCHAR(20)`      | YES  | -       | 単位                     |
 | `administration`    | `VARCHAR(200)`     | YES  | -       | 用法（例：「1日1回朝食後」）        |
 | `doses_per_day`     | `INT`              | YES  | -       | 1日回数（0=不定期）            |
-| `prescriber`        | `VARCHAR(100)`     | YES  | -       | 処方医                    |
-| `prescribed_at`     | `TIMESTAMPTZ`      | YES  | -       | 処方日時                   |
+| `prescriber`            | `VARCHAR(100)`     | YES  | -       | 処方医                    |
+| `medicines_comment`     | `TEXT`             | YES  | -       | 薬剤コメント                 |
+| `administration_comment`| `TEXT`             | YES  | -       | 用法コメント                 |
+| `prescribed_at`         | `TIMESTAMPTZ`      | YES  | -       | 処方日時                   |
 | `created_at`        | `TIMESTAMPTZ`      | NO   | `now()` | 作成日時                   |
 | `updated_at`        | `TIMESTAMPTZ`      | NO   | 自動更新    | 更新日時                   |
 
@@ -511,6 +540,11 @@ erDiagram
 
 - PK: `id`
 - FK: `admission_id` → `admissions(id)`
+
+**インデックス**:
+
+- `admission_id`（入院別処方一覧）
+- `yj_code`（薬剤コードによる検索）
 
 **備考**:
 
@@ -628,13 +662,13 @@ MLモデルによるせん妄リスク評価結果。基本的に1入院1回だ�
 
 #### care_plan_items（ケアプラン項目）
 
-ケアプランのカテゴリ別ステータス管理・詳細データテーブル。1ケアプランに対し9カテゴリ分のレコードが作成される。各カテゴリの問診回答データは `details` (JSONB) に格納する。
+ケアプランのカテゴリ別ステータス管理・詳細データテーブル。1ケアプランに対し10カテゴリ分のレコードが作成される。各カテゴリの問診回答データは `details` (JSONB) に格納する。
 
 | カラム                   | 型                    | NULL | デフォルト         | 説明                                       |
 |-----------------------|----------------------|------|---------------|------------------------------------------|
 | `id`                  | `SERIAL`             | NO   | 自動採番          | 主キー                                      |
 | `care_plan_id`        | `INT`                | NO   | -             | FK: `care_plans.id`                      |
-| `category`            | `CarePlanCategory`   | NO   | -             | ケアプランカテゴリ（9種）                            |
+| `category`            | `CarePlanCategory`   | NO   | -             | ケアプランカテゴリ（10種）                           |
 | `status`              | `CarePlanItemStatus` | NO   | `NOT_STARTED` | ステータス                                    |
 | `current_question_id` | `VARCHAR(20)`        | YES  | -             | 最後に回答した設問ID（問診フロー中の進捗追跡）                 |
 | `details`             | `JSONB`              | YES  | -             | カテゴリ固有の問診回答データ（下記JSONスキーマ参照）              |
@@ -650,10 +684,14 @@ MLモデルによるせん妄リスク評価結果。基本的に1入院1回だ�
 - FK: `care_plan_id` → `care_plans(id)`
 - UQ: `(care_plan_id, category)`（1ケアプランにつき各カテゴリ1レコード）
 
+**インデックス**:
+
+- `(care_plan_id, category)` UNIQUE（カテゴリ別アイテム取得）
+
 **備考**:
 
-- カテゴリは9種固定: 薬剤・疼痛・脱水・便秘・炎症・離床・認知症・安全管理・睡眠
-- ステータス遷移: `NOT_STARTED` → `IN_PROGRESS` → `COMPLETED`
+- カテゴリは10種固定: 薬剤・疼痛・脱水・便秘・炎症・離床・認知症・安全管理・睡眠・情報提供
+- ステータス遷移: `NOT_STARTED` → `IN_PROGRESS` → `COMPLETED`（PROVIDING_INFORMATION は `NOT_STARTED` → `COMPLETED`）
 - `details` のJSONスキーマはカテゴリごとに異なる。アプリケーション層でZodスキーマによるバリデーションを行う
 - データは常にカテゴリ単位で一括読み書きされるため、フィールド単位のDB検索は不要
 
@@ -811,6 +849,10 @@ MLモデルによるせん妄リスク評価結果。基本的に1入院1回だ�
 | フィールド | 型 | 説明 |
 |-----------|------|------|
 | `selectedItems` | `string[]` | 選択された対策項目IDのリスト |
+
+##### PROVIDING_INFORMATION（情報提供）
+
+PDF閲覧による情報提供確認。問診フローはなく、PDF閲覧ページに遷移して保存すれば完了となる。`details` は `null`（ステータスと `completed_at` で管理）。
 
 ---
 
@@ -1116,6 +1158,10 @@ MLモデルによるせん妄リスク評価結果。基本的に1入院1回だ�
 - PK: `id`
 - UQ: `(mapping_type, source_code)`（同一種別内で病院側コードはユニーク）
 
+**インデックス**:
+
+- `(mapping_type, source_code)` UNIQUE（マッピング検索）
+
 **マッピング種別**:
 
 | mapping_type     | 説明   | source      | target              |
@@ -1197,6 +1243,10 @@ MLモデルによるせん妄リスク評価結果。基本的に1入院1回だ�
 - FK: `user_id` → `users(id)` ON DELETE CASCADE
 - 部分ユニーク: `lock_key WHERE is_active = true`（アクティブなロックは1キーにつき1つ）
 
+**インデックス**:
+
+- `lock_key WHERE is_active = true` 部分UNIQUE（アクティブロックの一意性）
+
 **ロックキー**:
 
 | lock_key                | 説明         | デフォルトタイムアウト |
@@ -1244,7 +1294,7 @@ MLモデルによるせん妄リスク評価結果。基本的に1入院1回だ�
 | `Gender`             | `MALE`, `FEMALE`, `UNKNOWN`                                                                                         | 性別              |
 | `RiskLevel`          | `HIGH`, `LOW`, `INDETERMINATE`                                                                                      | リスク評価結果         |
 | `PrescriptionType`   | `ORAL`, `INJECTION`                                                                                                 | 処方種別            |
-| `CarePlanCategory`   | `MEDICINE`, `PAIN`, `DEHYDRATION`, `CONSTIPATION`, `INFLAMMATION`, `MOBILIZATION`, `DEMENTIA`, `SAFETY`, `SLEEP`    | ケアプランカテゴリ（9種固定） |
+| `CarePlanCategory`   | `MEDICINE`, `PAIN`, `DEHYDRATION`, `CONSTIPATION`, `INFLAMMATION`, `MOBILIZATION`, `DEMENTIA`, `SAFETY`, `SLEEP`, `PROVIDING_INFORMATION` | ケアプランカテゴリ（10種固定） |
 | `CarePlanItemStatus` | `NOT_STARTED`, `IN_PROGRESS`, `COMPLETED`                                                                           | ケアプラン項目ステータス    |
 | `LabItemCode`        | `RBC`, `WBC`, `HB`, `HT`, `PLT`, `AST`, `ALT`, `ALP`, `GAMMA_GT`, `CHE`, `CRE`, `UN`, `NA`, `K`, `CA`, `GLU`, `CRP` | 検査項目コード（17種）    |
 | `ReferenceItemType`  | `VITAL`, `LAB`                                                                                                      | 基準値項目種別         |
@@ -1287,33 +1337,8 @@ MLモデルによるせん妄リスク評価結果。基本的に1入院1回だ�
 | `MOBILIZATION` | 離床   | チェックリスト共通        |
 | `DEMENTIA`     | 認知症  | チェックリスト共通        |
 | `SAFETY`       | 安全管理 | チェックリスト共通        |
-| `SLEEP`        | 睡眠   | チェックリスト共通        |
-
----
-
-## 6. インデックス設計
-
-### 6.1 主要インデックス
-
-パフォーマンス要件（画面表示3秒以内、データ更新2秒以内）を満たすための主要インデックスを定義する。
-
-| テーブル               | インデックス                                   | 種別       | 用途             |
-|--------------------|------------------------------------------|----------|----------------|
-| `patients`         | `patient_id`                             | UNIQUE   | 電子カルテ患者IDによる検索 |
-| `admissions`       | `patient_id`                             | INDEX    | 患者の入院一覧取得      |
-| `admissions`       | `admission_date`                         | INDEX    | 入院日による絞り込み     |
-| `admissions`       | `external_admission_id`                  | UNIQUE   | 電子カルテ入院IDによる検索 |
-| `vital_signs`      | `(admission_id, measured_at)`            | UNIQUE   | Upsert用・時系列検索  |
-| `lab_results`      | `(admission_id, item_code, measured_at)` | UNIQUE   | Upsert用・項目別検索  |
-| `prescriptions`    | `admission_id`                           | INDEX    | 入院別処方一覧        |
-| `prescriptions`    | `yj_code`                                | INDEX    | 薬剤コードによる検索     |
-| `risk_assessments` | `admission_id WHERE is_active = true`    | 部分INDEX  | 有効な評価の取得       |
-| `care_plan_items`  | `(care_plan_id, category)`               | UNIQUE   | カテゴリ別アイテム取得    |
-| `audit_logs`       | `occurred_at`                            | INDEX    | 期間検索           |
-| `audit_logs`       | `actor_id`                               | INDEX    | ユーザー検索         |
-| `audit_logs`       | `(target_type, target_id)`               | INDEX    | 対象検索           |
-| `import_locks`     | `lock_key WHERE is_active = true`        | 部分UNIQUE | アクティブロックの一意性   |
-| `data_mappings`    | `(mapping_type, source_code)`            | UNIQUE   | マッピング検索        |
+| `SLEEP`                  | 睡眠   | チェックリスト共通        |
+| `PROVIDING_INFORMATION`  | 情報提供 | なし（`details` は `null`） |
 
 ---
 
