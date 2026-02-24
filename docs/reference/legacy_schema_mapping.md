@@ -30,7 +30,7 @@
 | (なし)                       | `care_plans`                                                                      | 新規。ケアプランヘッダーとして追加                                                                |
 | (なし)                       | `care_plan_items`                                                                 | 新規。カテゴリ別ステータス管理 + 各カテゴリの問診回答をJSONBで保持                                            |
 | (なし)                       | `transcription_histories`                                                         | 新規。看護記録転記の履歴管理                                                                   |
-| (なし)                       | `reference_values`                                                                | 新規。基準値マスタ                                                                        |
+| (なし)                       | `reference_value_masters`                                                                | 新規。基準値マスタ                                                                        |
 | (なし)                       | `data_mappings`                                                                   | 新規。病院コード変換マッピング                                                                  |
 | (なし)                       | `audit_logs`                                                                      | 新規。アプリ層監査ログ                                                                      |
 | (なし)                       | `system_settings`                                                                 | 新規。システム設定                                                                        |
@@ -55,4 +55,3 @@
 ## 関連ドキュメント
 
 - [データベース設計](../design/06_database_design.md)
-- [旧テーブル定義](../../tmp/table_definition/)

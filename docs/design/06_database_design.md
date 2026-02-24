@@ -79,7 +79,7 @@
 | 18 |          | `role_permissions`          | ロール・権限紐付け               |
 | 19 | マスタ      | `medicine_masters`          | 薬剤マスタ                   |
 | 20 |          | `medicine_name_settings`    | 病院別薬剤名称設定               |
-| 21 |          | `reference_values`          | バイタル・検査基準値              |
+| 21 |          | `reference_value_masters`          | バイタル・検査基準値              |
 | 22 | データマッピング | `data_mappings`             | 病院コード変換マッピング            |
 | 23 | システム     | `audit_logs`                | 監査ログ                    |
 | 24 |          | `import_locks`              | インポート排他ロック              |
@@ -1115,7 +1115,7 @@ PDF閲覧による情報提供確認。問診フローはなく、PDF閲覧ペ�
 
 ---
 
-#### reference_values（基準値マスタ）
+#### reference_value_masters（基準値マスタ）
 
 バイタルサイン・検査結果の基準値。性別ごとに上限・下限を管理する。
 

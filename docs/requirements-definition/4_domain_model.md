@@ -41,6 +41,7 @@ classDiagram
         脳器質的障害
         アルコール多飲
         せん妄既往
+        向精神薬使用
         全身麻酔
     }
     note for MedicalHistory "ML予測およびハイリスクケア加算の\n両方の入力となるリスク因子"
