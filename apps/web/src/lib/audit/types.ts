@@ -40,6 +40,7 @@ export const AUDIT_TARGET_TYPES = {
   SYSTEM_SETTING: "SYSTEM_SETTING",
   EMR_DATA: "EMR_DATA",
   IMPORT: "IMPORT",
+  DATA_MAPPING: "DATA_MAPPING",
 } as const;
 
 export type AuditTargetType = (typeof AUDIT_TARGET_TYPES)[keyof typeof AUDIT_TARGET_TYPES];
