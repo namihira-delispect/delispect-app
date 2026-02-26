@@ -35,7 +35,7 @@ const MENU_ITEMS: MenuItem[] = [
       { label: "ユーザー管理", href: "/admin/users", icon: "\uD83D\uDC65" },
       { label: "薬剤マスタ", href: "/admin/medicines", icon: "\uD83D\uDC8A" },
       { label: "基準値マスタ", href: "/admin/reference-values", icon: "\uD83D\uDCCA" },
-      { label: "システム設定", href: "/admin/settings", icon: "\uD83D\uDD27" },
+      { label: "システム設定", href: "/admin/system-settings", icon: "\uD83D\uDD27" },
       { label: "データマッピング", href: "/admin/data-mapping", icon: "\uD83D\uDD17" },
       { label: "監査ログ", href: "/admin/audit-logs", icon: "\uD83D\uDCDD" },
     ],

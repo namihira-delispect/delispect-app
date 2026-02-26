@@ -136,6 +136,7 @@ export const PAGE_ROLE_MAP: Record<string, UserRole[]> = {
   "/admin/medicines": ["SYSTEM_ADMIN", "SUPER_ADMIN"],
   "/admin/reference-values": ["SYSTEM_ADMIN", "SUPER_ADMIN"],
   "/admin/settings": ["SYSTEM_ADMIN", "SUPER_ADMIN"],
+  "/admin/system-settings": ["SYSTEM_ADMIN", "SUPER_ADMIN"],
   "/admin/data-mapping": ["SYSTEM_ADMIN", "SUPER_ADMIN"],
   "/admin/audit-logs": ["SYSTEM_ADMIN", "SUPER_ADMIN"],
   "/settings": ["GENERAL", "SYSTEM_ADMIN", "SUPER_ADMIN"],
