@@ -73,8 +73,10 @@ enum CarePlanItemStatus {
 
 enum DataMappingType {
   WARD
+  ROOM
   LAB_ITEM
   PRESCRIPTION_TYPE
+  VITAL_SIGN
 }
 
 // =============================================================================
