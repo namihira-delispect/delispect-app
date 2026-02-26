@@ -11,6 +11,7 @@ import { LabResultSection } from "./detail/LabResultSection";
 import { CareInfoSection } from "./detail/CareInfoSection";
 import { RiskAssessmentSection } from "./detail/RiskAssessmentSection";
 import { CarePlanSection } from "./detail/CarePlanSection";
+import { HighRiskKasanSection } from "@/features/high-risk-kasan/components";
 
 export interface AdmissionDetailViewerProps {
   /** 入院ID */
@@ -268,6 +269,9 @@ export function AdmissionDetailViewer({ admissionId }: AdmissionDetailViewerProp
         <LabResultSection labResults={detail.labResults} />
         <CareInfoSection careInfo={detail.careInfo} />
       </div>
+
+      {/* せん妄ハイリスクケア加算アセスメント */}
+      <HighRiskKasanSection admissionId={detail.admissionId} />
 
       {/* リスク評価・ケアプランは全幅で表示 */}
       <RiskAssessmentSection riskAssessments={detail.riskAssessments} />
