@@ -51,6 +51,10 @@ export const PERMISSION_CODES = {
 
   // ロール管理
   ROLE_MANAGE: "role:manage",
+
+  // 解析用操作ログ
+  RESEARCH_LOG_VIEW: "research_log:view",
+  RESEARCH_LOG_EXPORT: "research_log:export",
 } as const;
 
 export type PermissionCode =
@@ -96,6 +100,8 @@ export const ROLE_PERMISSIONS: Record<UserRole, PermissionCode[]> = {
     PERMISSION_CODES.SYSTEM_SETTING_EDIT,
     PERMISSION_CODES.DATA_MAPPING_VIEW,
     PERMISSION_CODES.DATA_MAPPING_EDIT,
+    PERMISSION_CODES.RESEARCH_LOG_VIEW,
+    PERMISSION_CODES.RESEARCH_LOG_EXPORT,
   ],
   SUPER_ADMIN: [
     // 全権管理者はすべての権限を持つ
@@ -120,6 +126,8 @@ export const ROLE_PERMISSIONS: Record<UserRole, PermissionCode[]> = {
     PERMISSION_CODES.DATA_MAPPING_EDIT,
     PERMISSION_CODES.USER_MANAGE,
     PERMISSION_CODES.ROLE_MANAGE,
+    PERMISSION_CODES.RESEARCH_LOG_VIEW,
+    PERMISSION_CODES.RESEARCH_LOG_EXPORT,
   ],
 };
 
@@ -139,5 +147,6 @@ export const PAGE_ROLE_MAP: Record<string, UserRole[]> = {
   "/admin/system-settings": ["SYSTEM_ADMIN", "SUPER_ADMIN"],
   "/admin/data-mapping": ["SYSTEM_ADMIN", "SUPER_ADMIN"],
   "/admin/audit-logs": ["SYSTEM_ADMIN", "SUPER_ADMIN"],
+  "/admin/research-logs": ["SYSTEM_ADMIN", "SUPER_ADMIN"],
   "/settings": ["GENERAL", "SYSTEM_ADMIN", "SUPER_ADMIN"],
 };
