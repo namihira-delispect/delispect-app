@@ -52,13 +52,16 @@ enum PrescriptionType {
 }
 
 enum CarePlanCategory {
-  PAIN
-  SLEEP
-  MOBILITY
-  NUTRITION
-  ORIENTATION
-  ENVIRONMENT
   MEDICATION
+  PAIN
+  DEHYDRATION
+  CONSTIPATION
+  INFLAMMATION
+  MOBILITY
+  DEMENTIA
+  SAFETY
+  SLEEP
+  INFORMATION
 }
 
 enum CarePlanItemStatus {
@@ -440,10 +443,11 @@ model ReferenceValueMaster {
   unit         String?  @db.VarChar(20)
   lowerLimit   Decimal? @map("lower_limit") @db.Decimal(10, 3)
   upperLimit   Decimal? @map("upper_limit") @db.Decimal(10, 3)
+  gender       Gender?
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz()
 
-  @@unique([itemCode])
+  @@unique([itemCode, gender])
   @@map("reference_value_masters")
 }
 
@@ -511,4 +515,21 @@ model SystemSetting {
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
 
   @@map("system_settings")
+}
+
+// =============================================================================
+// Research / Analytics Domain
+// =============================================================================
+
+model ResearchLog {
+  id            BigInt   @id @default(autoincrement())
+  anonymizedId  String   @map("anonymized_id") @db.VarChar(64)
+  actionType    String   @map("action_type") @db.VarChar(50)
+  details       Json?    @db.JsonB
+  occurredAt    DateTime @default(now()) @map("occurred_at") @db.Timestamptz()
+
+  @@index([anonymizedId])
+  @@index([actionType])
+  @@index([occurredAt])
+  @@map("research_logs")
 }
