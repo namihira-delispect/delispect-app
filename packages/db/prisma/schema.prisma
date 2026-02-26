@@ -1,0 +1,514 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================================================
+// Enums
+// =============================================================================
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  UNKNOWN
+}
+
+enum RiskLevel {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum LabItemCode {
+  WBC
+  RBC
+  HGB
+  HCT
+  PLT
+  CRP
+  ALB
+  BUN
+  CRE
+  NA
+  K
+  CL
+  AST
+  ALT
+  LDH
+  GGT
+  TBIL
+  GLU
+}
+
+enum PrescriptionType {
+  ORAL
+  INJECTION
+  EXTERNAL
+}
+
+enum CarePlanCategory {
+  PAIN
+  SLEEP
+  MOBILITY
+  NUTRITION
+  ORIENTATION
+  ENVIRONMENT
+  MEDICATION
+}
+
+enum CarePlanItemStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  NOT_APPLICABLE
+}
+
+enum DataMappingType {
+  WARD
+  LAB_ITEM
+  PRESCRIPTION_TYPE
+}
+
+// =============================================================================
+// Patient / Admission Domain
+// =============================================================================
+
+model Patient {
+  id            Int      @id @default(autoincrement())
+  patientId     String   @unique @map("patient_id") @db.VarChar(20)
+  lastName      String   @map("last_name") @db.VarChar(50)
+  firstName     String   @map("first_name") @db.VarChar(50)
+  lastNameKana  String?  @map("last_name_kana") @db.VarChar(50)
+  firstNameKana String?  @map("first_name_kana") @db.VarChar(50)
+  birthday      DateTime @db.Date
+  sex           Gender
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  admissions Admission[]
+
+  @@map("patients")
+}
+
+model Admission {
+  id                  Int       @id @default(autoincrement())
+  patientId           Int       @map("patient_id")
+  externalAdmissionId String    @unique @map("external_admission_id") @db.VarChar(30)
+  admissionDate       DateTime  @map("admission_date") @db.Date
+  admissionTime       DateTime? @map("admission_time") @db.Time()
+  ageAtAdmission      Int?      @map("age_at_admission")
+  height              Decimal?  @db.Decimal(5, 1)
+  weight              Decimal?  @db.Decimal(5, 1)
+  dischargeDate       DateTime? @map("discharge_date") @db.Date
+  ward                String?   @db.VarChar(50)
+  room                String?   @db.VarChar(50)
+  version             Int       @default(0)
+  createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt           DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+
+  patient            Patient             @relation(fields: [patientId], references: [id])
+  medicalHistory     MedicalHistory?
+  vitalSigns         VitalSign[]
+  labResults         LabResult[]
+  prescriptions      Prescription[]
+  riskAssessments    RiskAssessment[]
+  highRiskCareKasan  HighRiskCareKasan?
+  carePlan           CarePlan?
+
+  @@index([patientId])
+  @@index([admissionDate])
+  @@map("admissions")
+}
+
+model MedicalHistory {
+  id                    Int      @id @default(autoincrement())
+  admissionId           Int      @unique @map("admission_id")
+  hasDementia           Boolean? @map("has_dementia")
+  hasOrganicBrainDamage Boolean? @map("has_organic_brain_damage")
+  isHeavyAlcohol        Boolean? @map("is_heavy_alcohol")
+  hasDeliriumHistory    Boolean? @map("has_delirium_history")
+  usesPsychotropicDrugs Boolean? @map("uses_psychotropic_drugs")
+  hasGeneralAnesthesia  Boolean? @map("has_general_anesthesia")
+  hasEmergencySurgery   Boolean? @map("has_emergency_surgery")
+  hasScheduledSurgery   Boolean? @map("has_scheduled_surgery")
+  hasHeadNeckSurgery    Boolean? @map("has_head_neck_surgery")
+  hasChestSurgery       Boolean? @map("has_chest_surgery")
+  hasAbdominalSurgery   Boolean? @map("has_abdominal_surgery")
+  hasAdmissionOxygenUse Boolean? @map("has_admission_oxygen_use")
+  oxygenLevel           Decimal? @map("oxygen_level") @db.Decimal(4, 1)
+  version               Int      @default(0)
+  createdAt             DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt             DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  admission Admission @relation(fields: [admissionId], references: [id])
+
+  @@map("medical_histories")
+}
+
+// =============================================================================
+// Clinical Data Domain (Electronic Medical Records Integration)
+// =============================================================================
+
+model VitalSign {
+  id                 Int       @id @default(autoincrement())
+  admissionId        Int       @map("admission_id")
+  bodyTemperature    Decimal?  @map("body_temperature") @db.Decimal(4, 1)
+  pulse              Int?
+  systolicBp         Int?      @map("systolic_bp")
+  diastolicBp        Int?      @map("diastolic_bp")
+  spo2               Decimal?  @db.Decimal(4, 1)
+  respiratoryRate    Int?      @map("respiratory_rate")
+  measuredAt         DateTime  @map("measured_at") @db.Timestamptz()
+  bodyTemperatureAt  DateTime? @map("body_temperature_at") @db.Timestamptz()
+  pulseAt            DateTime? @map("pulse_at") @db.Timestamptz()
+  systolicBpAt       DateTime? @map("systolic_bp_at") @db.Timestamptz()
+  diastolicBpAt      DateTime? @map("diastolic_bp_at") @db.Timestamptz()
+  spo2At             DateTime? @map("spo2_at") @db.Timestamptz()
+  respiratoryRateAt  DateTime? @map("respiratory_rate_at") @db.Timestamptz()
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt          DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+
+  admission Admission @relation(fields: [admissionId], references: [id])
+
+  @@unique([admissionId, measuredAt])
+  @@map("vital_signs")
+}
+
+model LabResult {
+  id          Int         @id @default(autoincrement())
+  admissionId Int         @map("admission_id")
+  itemCode    LabItemCode @map("item_code")
+  value       Decimal     @db.Decimal(10, 3)
+  measuredAt  DateTime    @map("measured_at") @db.Timestamptz()
+  createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime    @updatedAt @map("updated_at") @db.Timestamptz()
+
+  admission Admission @relation(fields: [admissionId], references: [id])
+
+  @@unique([admissionId, itemCode, measuredAt])
+  @@index([admissionId])
+  @@map("lab_results")
+}
+
+model Prescription {
+  id               Int              @id @default(autoincrement())
+  admissionId      Int              @map("admission_id")
+  yjCode           String?          @map("yj_code") @db.VarChar(20)
+  drugName         String           @map("drug_name") @db.VarChar(200)
+  prescriptionType PrescriptionType @map("prescription_type")
+  prescribedAt     DateTime         @map("prescribed_at") @db.Timestamptz()
+  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt        DateTime         @updatedAt @map("updated_at") @db.Timestamptz()
+
+  admission      Admission       @relation(fields: [admissionId], references: [id])
+  medicineMaster MedicineMaster? @relation(fields: [yjCode], references: [medicinesCode])
+
+  @@index([admissionId])
+  @@map("prescriptions")
+}
+
+// =============================================================================
+// Risk Assessment Domain
+// =============================================================================
+
+model RiskAssessment {
+  id              Int       @id @default(autoincrement())
+  admissionId     Int       @map("admission_id")
+  assessedById    Int       @map("assessed_by_id")
+  riskLevel       RiskLevel @map("risk_level")
+  riskFactors     Json      @map("risk_factors") @db.JsonB
+  mlInputSnapshot Json      @map("ml_input_snapshot") @db.JsonB
+  isActive        Boolean   @default(true) @map("is_active")
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+
+  admission  Admission @relation(fields: [admissionId], references: [id])
+  assessedBy User      @relation(fields: [assessedById], references: [id])
+
+  @@index([admissionId])
+  @@map("risk_assessments")
+}
+
+// =============================================================================
+// High Risk Care Kasan Domain
+// =============================================================================
+
+model HighRiskCareKasan {
+  id           Int      @id @default(autoincrement())
+  admissionId  Int      @unique @map("admission_id")
+  assessedById Int      @map("assessed_by_id")
+  isEligible   Boolean  @map("is_eligible")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  admission  Admission @relation(fields: [admissionId], references: [id])
+  assessedBy User      @relation(fields: [assessedById], references: [id])
+
+  @@map("high_risk_care_kasans")
+}
+
+// =============================================================================
+// Care Plan Domain
+// =============================================================================
+
+model CarePlan {
+  id          Int      @id @default(autoincrement())
+  admissionId Int      @unique @map("admission_id")
+  createdById Int      @map("created_by_id")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  admission              Admission                @relation(fields: [admissionId], references: [id])
+  createdBy              User                     @relation(fields: [createdById], references: [id])
+  items                  CarePlanItem[]
+  transcriptionHistories TranscriptionHistory[]
+
+  @@map("care_plans")
+}
+
+model CarePlanItem {
+  id                Int                @id @default(autoincrement())
+  carePlanId        Int                @map("care_plan_id")
+  category          CarePlanCategory
+  status            CarePlanItemStatus @default(NOT_STARTED)
+  currentQuestionId String?            @map("current_question_id") @db.VarChar(50)
+  details           Json?              @db.JsonB
+  instructions      String?            @db.Text
+  createdAt         DateTime           @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt         DateTime           @updatedAt @map("updated_at") @db.Timestamptz()
+
+  carePlan CarePlan @relation(fields: [carePlanId], references: [id])
+
+  @@index([carePlanId])
+  @@map("care_plan_items")
+}
+
+model TranscriptionHistory {
+  id         Int      @id @default(autoincrement())
+  carePlanId Int      @map("care_plan_id")
+  content    String   @db.Text
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  carePlan CarePlan @relation(fields: [carePlanId], references: [id])
+
+  @@index([carePlanId])
+  @@map("transcription_histories")
+}
+
+// =============================================================================
+// User / Authorization Domain
+// =============================================================================
+
+model User {
+  id                  Int       @id @default(autoincrement())
+  username            String    @unique @db.VarChar(50)
+  email               String    @unique @db.VarChar(255)
+  passwordHash        String    @map("password_hash") @db.VarChar(255)
+  isActive            Boolean   @default(true) @map("is_active")
+  failedLoginAttempts Int       @default(0) @map("failed_login_attempts")
+  lockedUntil         DateTime? @map("locked_until") @db.Timestamptz()
+  createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt           DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+
+  sessions           Session[]
+  userRoles          UserRole[]
+  riskAssessments    RiskAssessment[]
+  highRiskCareKasans HighRiskCareKasan[]
+  carePlans          CarePlan[]
+  auditLogs          AuditLog[]
+  importLocks        ImportLock[]
+
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @db.VarChar(255)
+  userId    Int      @map("user_id")
+  expiresAt DateTime @map("expires_at") @db.Timestamptz()
+  ipAddress String?  @map("ip_address") @db.VarChar(45)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model Role {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @db.VarChar(50)
+  description String?  @db.VarChar(255)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  userRoles       UserRole[]
+  rolePermissions RolePermission[]
+
+  @@map("roles")
+}
+
+model UserRole {
+  userId    Int      @map("user_id")
+  roleId    Int      @map("role_id")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  user User @relation(fields: [userId], references: [id])
+  role Role @relation(fields: [roleId], references: [id])
+
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
+
+model PermissionCategory {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique @db.VarChar(100)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  permissions Permission[]
+
+  @@map("permission_categories")
+}
+
+model Permission {
+  id         Int      @id @default(autoincrement())
+  categoryId Int      @map("category_id")
+  code       String   @unique @db.VarChar(100)
+  name       String   @db.VarChar(200)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  category        PermissionCategory @relation(fields: [categoryId], references: [id])
+  rolePermissions RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       Int      @map("role_id")
+  permissionId Int      @map("permission_id")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  role       Role       @relation(fields: [roleId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+// =============================================================================
+// Master Data Domain
+// =============================================================================
+
+model MedicineMaster {
+  id            Int      @id @default(autoincrement())
+  categoryId    Int      @map("category_id")
+  medicinesCode String   @unique @map("medicines_code") @db.VarChar(20)
+  riskFactorFlg Boolean  @default(false) @map("risk_factor_flg")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  prescriptions      Prescription[]
+  medicineNameSettings MedicineNameSetting[]
+
+  @@map("medicine_masters")
+}
+
+model MedicineNameSetting {
+  id               Int      @id @default(autoincrement())
+  medicineMasterId Int      @map("medicine_master_id")
+  hospitalCode     String   @map("hospital_code") @db.VarChar(20)
+  displayName      String   @map("display_name") @db.VarChar(200)
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  medicineMaster MedicineMaster @relation(fields: [medicineMasterId], references: [id])
+
+  @@unique([medicineMasterId, hospitalCode])
+  @@map("medicine_name_settings")
+}
+
+model ReferenceValueMaster {
+  id           Int      @id @default(autoincrement())
+  itemCode     String   @map("item_code") @db.VarChar(20)
+  itemName     String   @map("item_name") @db.VarChar(100)
+  unit         String?  @db.VarChar(20)
+  lowerLimit   Decimal? @map("lower_limit") @db.Decimal(10, 3)
+  upperLimit   Decimal? @map("upper_limit") @db.Decimal(10, 3)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@unique([itemCode])
+  @@map("reference_value_masters")
+}
+
+// =============================================================================
+// Data Mapping Domain
+// =============================================================================
+
+model DataMapping {
+  id          Int             @id @default(autoincrement())
+  mappingType DataMappingType @map("mapping_type")
+  sourceCode  String          @map("source_code") @db.VarChar(50)
+  targetCode  String          @map("target_code") @db.VarChar(50)
+  priority    Int             @default(0)
+  createdAt   DateTime        @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime        @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@unique([mappingType, sourceCode])
+  @@map("data_mappings")
+}
+
+// =============================================================================
+// System Domain
+// =============================================================================
+
+model AuditLog {
+  id         BigInt   @id @default(autoincrement())
+  actorId    Int      @map("actor_id")
+  action     String   @db.VarChar(50)
+  targetType String   @map("target_type") @db.VarChar(50)
+  targetId   String   @map("target_id") @db.VarChar(50)
+  beforeData Json?    @map("before_data") @db.JsonB
+  afterData  Json?    @map("after_data") @db.JsonB
+  hash       String   @db.VarChar(64)
+  prevHash   String?  @map("prev_hash") @db.VarChar(64)
+  occurredAt DateTime @default(now()) @map("occurred_at") @db.Timestamptz()
+
+  actor User @relation(fields: [actorId], references: [id])
+
+  @@index([actorId])
+  @@index([targetType, targetId])
+  @@index([occurredAt])
+  @@map("audit_logs")
+}
+
+model ImportLock {
+  id        Int      @id @default(autoincrement())
+  lockKey   String   @map("lock_key") @db.VarChar(100)
+  userId    Int      @map("user_id")
+  isActive  Boolean  @default(true) @map("is_active")
+  expiresAt DateTime @map("expires_at") @db.Timestamptz()
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([lockKey, isActive])
+  @@map("import_locks")
+}
+
+model SystemSetting {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique @db.VarChar(100)
+  value     String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@map("system_settings")
+}
