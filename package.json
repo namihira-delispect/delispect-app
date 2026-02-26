@@ -1,0 +1,33 @@
+{
+  "name": "delispect",
+  "private": true,
+  "version": "0.0.0",
+  "description": "DELISPECT - Delirium Risk Assessment System",
+  "scripts": {
+    "dev": "pnpm --filter @delispect/web dev",
+    "build": "pnpm --filter @delispect/web build",
+    "lint": "pnpm -r lint",
+    "lint:fix": "pnpm -r lint:fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "test:watch": "pnpm -r test:watch",
+    "test:coverage": "pnpm -r test:coverage",
+    "db:generate": "pnpm --filter @delispect/db db:generate",
+    "db:migrate:dev": "pnpm --filter @delispect/db db:migrate:dev",
+    "db:migrate:deploy": "pnpm --filter @delispect/db db:migrate:deploy",
+    "db:push": "pnpm --filter @delispect/db db:push",
+    "db:seed": "pnpm --filter @delispect/db db:seed",
+    "clean": "pnpm -r clean && rm -rf node_modules"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.4.0"
+  },
+  "packageManager": "pnpm@10.30.2",
+  "license": "UNLICENSED"
+}
