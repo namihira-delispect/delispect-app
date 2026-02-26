@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AppShell } from "./AppShell";
 
 export const metadata: Metadata = {
   title: "DELISPECT",
@@ -12,7 +13,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body>{children}</body>
+      <body style={{ margin: 0, fontFamily: "sans-serif" }}>
+        <AppShell>{children}</AppShell>
+      </body>
     </html>
   );
 }
