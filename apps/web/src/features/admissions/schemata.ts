@@ -45,3 +45,22 @@ export const batchRiskAssessmentSchema = z.object({
 });
 
 export type BatchRiskAssessmentInput = z.infer<typeof batchRiskAssessmentSchema>;
+
+/**
+ * 入院詳細取得パラメータのバリデーションスキーマ
+ */
+export const admissionDetailParamsSchema = z.object({
+  id: z.coerce.number().int().positive("入院IDは正の整数で指定してください"),
+});
+
+export type AdmissionDetailParamsInput = z.infer<typeof admissionDetailParamsSchema>;
+
+/**
+ * 楽観的ロック用バージョンチェックスキーマ
+ */
+export const optimisticLockSchema = z.object({
+  admissionId: z.number().int().positive("入院IDは正の整数で指定してください"),
+  expectedVersion: z.number().int().min(0, "バージョンは0以上の整数で指定してください"),
+});
+
+export type OptimisticLockInput = z.infer<typeof optimisticLockSchema>;
