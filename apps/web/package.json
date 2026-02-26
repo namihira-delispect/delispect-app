@@ -15,9 +15,12 @@
     "clean": "rm -rf .next out"
   },
   "dependencies": {
+    "@delispect/auth": "workspace:*",
+    "@delispect/db": "workspace:*",
     "next": "^15.1.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "zod": "^3.25.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.0",
