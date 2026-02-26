@@ -2,7 +2,7 @@ export { Loading } from "./Loading";
 export type { LoadingProps } from "./Loading";
 
 export { ErrorMessage } from "./ErrorMessage";
-export type { ErrorMessageProps } from "./ErrorMessage";
+export type { ErrorMessageProps, ErrorVariant } from "./ErrorMessage";
 
 export { ConfirmDialog } from "./ConfirmDialog";
 export type { ConfirmDialogProps } from "./ConfirmDialog";
