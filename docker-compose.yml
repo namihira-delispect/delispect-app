@@ -1,0 +1,63 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://delispect:delispect@internaldb:5432/delispect
+      - EXTERNAL_DATABASE_URL=postgresql://delispect:delispect@externaldb:5433/delispect_external
+    depends_on:
+      internaldb:
+        condition: service_healthy
+      externaldb:
+        condition: service_healthy
+    volumes:
+      - ./apps/web/src:/app/apps/web/src
+    networks:
+      - delispect-network
+
+  internaldb:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: delispect
+      POSTGRES_PASSWORD: delispect
+      POSTGRES_DB: delispect
+    volumes:
+      - internaldb-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U delispect"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - delispect-network
+
+  externaldb:
+    image: postgres:15-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: delispect
+      POSTGRES_PASSWORD: delispect
+      POSTGRES_DB: delispect_external
+    volumes:
+      - externaldb-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U delispect"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - delispect-network
+
+volumes:
+  internaldb-data:
+  externaldb-data:
+
+networks:
+  delispect-network:
+    driver: bridge
