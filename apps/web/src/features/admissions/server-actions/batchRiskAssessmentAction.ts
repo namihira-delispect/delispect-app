@@ -4,6 +4,7 @@ import { authorizeServerAction } from "@/lib/auth";
 import type { Result } from "@/shared/types";
 import type { BatchRiskAssessmentResponse } from "../types";
 import { batchRiskAssessmentSchema } from "../schemata";
+import { executeRiskAssessmentAction } from "@/features/risk-assessment/server-actions";
 
 /**
  * 一括リスク評価を実行するServer Action
@@ -11,7 +12,7 @@ import { batchRiskAssessmentSchema } from "../schemata";
  * 医師・看護師長以上のロール（SYSTEM_ADMIN, SUPER_ADMIN）のみ実行可能。
  * 上限50件までの入院レコードに対してリスク評価を一括実行する。
  *
- * 現在の実装はモック（ML APIとの統合は後続チケットで実装）
+ * 実際のリスク評価ロジックはrisk-assessment機能に委譲する。
  */
 export async function batchRiskAssessmentAction(input: {
   admissionIds: number[];
@@ -33,18 +34,25 @@ export async function batchRiskAssessmentAction(input: {
 
   const { admissionIds } = parsed.data;
 
-  // モック実装: ML APIとの連携は後続で実装
-  // 現在は全件成功として返す
-  const results = admissionIds.map((admissionId) => ({
-    admissionId,
-    success: true,
+  // risk-assessment機能に委譲
+  const assessmentResult = await executeRiskAssessmentAction({ admissionIds });
+
+  if (!assessmentResult.success) {
+    return assessmentResult;
+  }
+
+  // レスポンス形式を変換（BatchRiskAssessmentResponse形式に合わせる）
+  const results = assessmentResult.value.results.map((r) => ({
+    admissionId: r.admissionId,
+    success: r.success,
+    ...(r.error ? { error: r.error } : {}),
   }));
 
   return {
     success: true,
     value: {
-      successCount: results.length,
-      failureCount: 0,
+      successCount: assessmentResult.value.successCount,
+      failureCount: assessmentResult.value.failureCount,
       results,
     },
   };
